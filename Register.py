@@ -10,43 +10,61 @@ db = client['mydb']
 collection = db['Fin']
 
 list_users = [
-    {"username": "Admin", "password": "password", "path": r" /Desktop", "Mail": "poluru.vk@gmail.com",
-     "DateCreated": str(datetime.date.today())}
+    {"username": "Admin", "password": "password", "mobile":"7075599756", "Mail": "poluru.vk@gmail.com"}
 ]
-collection.insert_many(list_users)
 
+collection.insert_many(list_users)
+show_pass=1
+
+def on_showhide():
+    global show_pass
+    if show_pass==1:
+        show_pass=0
+        hide_pwd()
+    else:
+        show_pass=1
+        show_pwd()
+
+def show_pwd():
+    passwordin.configure(show='')
+    showpassbuton.configure(text="Hide")
+
+def hide_pwd():
+    passwordin.configure(show="*")
+    showpassbuton.configure(text="Show")
 
 def take_in():
     username = usernamein.get()
     password = passwordin.get()
-    reenter = repasswordin.get()
+    mobile = repasswordin.get()
     mail = mail_in.get()
     acc = checkin.get()
-    checkinp(username, password, reenter, mail, acc)
+    checkinp(username, password, mobile, mail, acc)
 
 
-def checkinp(username, password, reeneter, mail, acc):
+def checkinp(username, password, mobile, mail, acc):
     counts = 0
     if collection.find_one({"username": username}):
         messagebox.showerror("UI Builder", "Username already Exists!")
+
     else:
         counts += 1
 
     if len(password) < 8:
         messagebox.showerror("UI Builder", "Choose a longer password")
+        breakpoint()
     else:
-        if password == reeneter:
-            counts += 1
-        else:
-            messagebox.showerror("UI Builder", "Passwords don't match")
+        counts+=1
 
-    counts += acc
-
-    if counts == 3:
-        lst = {"username": username, "password": password, "path": "ok", "Mail": mail,
-               "DateCreated": str(datetime.date.today())}
-        collection.insert_many(lst)
-        registerInfo()
+    if len(mobile)==10:
+        counts+=1
+    counts+=acc
+    if acc==0:
+        messagebox.showwarning("UI Builder","Select all options before proceeding ")
+    if counts==4:
+        list_users=[{"username": username, "password": password, "mobile":str(mobile), "Mail": mail}]
+        print(list_users)
+        collection.insert_many(list_users)
 
 
 def registerInfo():
@@ -70,21 +88,33 @@ Registertxt.place(x=450, y=145)
 
 Usernametext = tk.Label(text="Username    :", bg='white', font=('Bahnschrift', 13,), fg='#7A7A7A')
 Usernametext.place(x=330, y=210)
+
 usernamein = tk.Entry(register_page, border=0, font=('Bahnschrift', 13,), fg='black', bg='#F6F6F6')
 usernamein.place(x=450, y=213)
+
 passwordtext = tk.Label(text="Password    :", bg='white', font=('Bahnschrift', 13,), fg='#7A7A7A')
 passwordtext.place(x=330, y=250)
-passwordin = tk.Entry(register_page, border=0, font=('Bahnschrift', 13,), fg='black', bg='#F6F6F6')
+
+passwordin = tk.Entry(register_page,show="*", border=0, font=('Bahnschrift', 13,), fg='black', bg='#F6F6F6')
 passwordin.place(x=450, y=253)
-reneter = tk.Label(text="Reenter       :", bg='white', font=('Bahnschrift', 13,), fg='#7A7A7A')
-reneter.place(x=330, y=290)
+
+showpassbuton=tk.Button(register_page,command=on_showhide,text="Show",border=0,bg="white",fg="gray",font=("Bahnschrift",10))
+showpassbuton.place(x=650,y=253)
+
+mobile = tk.Label(text="Contact     :", bg='white', font=('Bahnschrift', 13,), fg='#7A7A7A')
+mobile.place(x=330, y=290)
+
 repasswordin = tk.Entry(register_page, border=0, font=('Bahnschrift', 13,), fg='black', bg='#F6F6F6')
 repasswordin.place(x=450, y=293)
+
 mail_text = tk.Label(text="Mail ID         :", bg='white', font=('Bahnschrift', 13,), fg='#7A7A7A')
 mail_text.place(x=330, y=330)
+
 mail_in = tk.Entry(register_page, border=0, font=('Bahnschrift', 13,), fg='black', bg='#F6F6F6')
 mail_in.place(x=450, y=330)
+
 checkin = tk.IntVar()
+
 accept_terms = tk.Checkbutton(register_page, variable=checkin, bg='white', fg='Green')
 accept_terms.place(x=295, y=380)
 accept_terms_text = tk.Label(text="By clicking you agree to the terms and conditions", font=('Bahnschrift', 12),
@@ -97,5 +127,5 @@ login_button.place(x=470, y=420)
 
 tc = tk.Label(text="Amrita Vishwa Vidyapeetham", font=('Bahnschrift', 10), fg='gray', bg="white")
 tc.place(x=560, y=475)
-
+print(collection.list_indexes())
 register_page.mainloop()
