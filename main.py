@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from twilio.rest import Client
 
-import os
 mainscreen=tk.Tk()
 mainscreen.geometry('950x600')
 mainscreen.resizable(False,False)
@@ -14,6 +14,20 @@ menubar.add_cascade(label="Hello")
 mainscreen.config(menu=menubar)
 
 '''
+
+def on_forgot():
+
+    account_sid = 'ACbf48d4618102147aeae7e093832b3b09'
+    auth_token = '392ba4b50afbee434db5fe49213f05b6'
+    client = Client(account_sid, auth_token)
+    message = client.messages.create(
+        messaging_service_sid='MG0f8d40b437f48ed64000f04312539f3f',
+        body='How Can You Forget Your Password',
+        to='+919491956708'
+    )
+
+    print(message.sid)
+
 
 def on_logout():
     mainscreen.quit()
@@ -79,9 +93,9 @@ tabControl.add(tab2, text='Project 2')
 tabControl.place(x=250,y=80)
 
 ttk.Label(tab1,
-          text="HariPavan Reddy",font=('Bahnschrift', 14,)).grid(column=0,row=0,padx=30,pady=30)
+          text="Project 1",font=('Bahnschrift', 14,)).grid(column=0,row=0,padx=320,pady=250)
 ttk.Label(tab2,
-          text="Oshim Adit",font=('Bahnschrift', 14,)).grid(column=0,row=0,padx=30,pady=30)
+          text="Project 2",font=('Bahnschrift', 14,)).grid(column=0,row=0,padx=320,pady=250)
 
 '''
 

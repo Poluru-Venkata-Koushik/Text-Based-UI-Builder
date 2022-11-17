@@ -1,19 +1,20 @@
 import tkinter as tk
 from PIL import ImageTk, Image
-import datetime
+
 from pymongo import MongoClient
 from tkinter import messagebox
 
 client = MongoClient('localhost', 27017)
 db = client['mydb']
 
-collection = db['Fin']
+collection = db['Final']
 
 list_users = [
     {"username": "Admin", "password": "password", "mobile":"7075599756", "Mail": "poluru.vk@gmail.com"}
 ]
+#collection.insert_many(list_users)
 
-collection.insert_many(list_users)
+
 show_pass=1
 
 def on_showhide():
@@ -50,21 +51,24 @@ def checkinp(username, password, mobile, mail, acc):
     else:
         counts += 1
 
-    if len(password) < 8:
-        messagebox.showerror("UI Builder", "Choose a longer password")
-        breakpoint()
-    else:
-        counts+=1
+        if len(password) < 8:
+            messagebox.showerror("UI Builder", "Choose a longer password")
+        else:
+            counts+=1
 
-    if len(mobile)==10:
-        counts+=1
-    counts+=acc
-    if acc==0:
-        messagebox.showwarning("UI Builder","Select all options before proceeding ")
+            if len(mobile)==10:
+                counts+=1
+            counts+=acc
+            if acc==0:
+                messagebox.showwarning("UI Builder","Select all options before proceeding ")
     if counts==4:
         list_users=[{"username": username, "password": password, "mobile":str(mobile), "Mail": mail}]
         print(list_users)
         collection.insert_many(list_users)
+        messagebox.showinfo("UI Builder","Welcome to the community "+username+", Reopen the application to start using it!")
+        quit()
+    else:
+        messagebox.showerror("UI Builder", "Fill all the Details")
 
 
 def registerInfo():
@@ -127,5 +131,4 @@ login_button.place(x=470, y=420)
 
 tc = tk.Label(text="Amrita Vishwa Vidyapeetham", font=('Bahnschrift', 10), fg='gray', bg="white")
 tc.place(x=560, y=475)
-print(collection.list_indexes())
 register_page.mainloop()

@@ -1,7 +1,15 @@
 import smtplib
 import tkinter as tk
 from PIL import ImageTk, Image
+from tkinter import messagebox
+from pymongo import MongoClient
+import os
 
+
+client = MongoClient('localhost', 27017)
+db = client['mydb']
+
+collection = db['Final']
 
 login_page=tk.Tk()
 login_page.geometry('750x500')
@@ -14,31 +22,39 @@ logo_lab = tk.Label(image = img0)
 logo_lab.place(x=570,y=-3)'''
 
 def on_forgot():
-    gmail_user = 'me.pvkoushik@gmail.com'
-    gmail_password = '00001334628'
+    a= usernamein.get()
+    if len(a)==0:
+        messagebox.showerror("UI BUILDER","Enter your mobile number first")
+        return 0
+    if collection.find({"username":a}):
 
-    sent_from = gmail_user
-    to = ['poluru.vk@gmail.com']
-    subject = 'Lorem ipsum dolor sit amet'
-    body = 'consectetur adipiscing elit'
+        from twilio.rest import Client
 
-    email_text = """\
-    From: %s
-    To: %s
-    Subject: %s
+        account_sid = 'ACbf48d4618102147aeae7e093832b3b09'
+        auth_token = '392ba4b50afbee434db5fe49213f05b6'
+        client = Client(account_sid, auth_token)
 
-    %s
-    """ % (sent_from, ", ".join(to), subject, body)
+        message = client.messages.create(
+            messaging_service_sid='MG0f8d40b437f48ed64000f04312539f3f',
+            body='Your password is ******',
+            to='+917989006406'
+        )
+    else:
+        messagebox.showerror("UI BUILDER","Username not found")
 
-    try:
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(gmail_user, gmail_password)
-        smtp_server.sendmail(sent_from, to, email_text)
-        smtp_server.close()
-        print("Email sent successfully!")
-    except Exception as ex:
-        print("Something went wrong….", ex)
+    print(message.sid)
+
+
+def on_login():
+    if collection.find_one({"$and": [{"username":usernamein.get()},{"password":passwordin.get()}]}):
+        os.system("python main.py")
+    else:
+        messagebox.showwarning("UI BUILDER","Please Check your username and password")
+
+def on_register():
+    os.system("python register.py")
+
+
 
 tc=tk.Label(text="Amrita Vishwa Vidyapeetham",font=('Bahnschrift',10),fg='gray',bg="white")
 tc.place(x=560,y=475)
@@ -64,7 +80,7 @@ passwordtext.place(x=300,y=250)
 passwordin=tk.Entry(login_page,show='*',border=0,font=('Bahnschrift',13,),fg='black',bg='#F6F6F6')
 passwordin.place(x=420,y=253)
 
-login_button = tk.Button(login_page, text="Log in",width=14, font=('Bahnschrift', 13,'bold'),border=0, bg='#086587',fg='#FCFCFC')
+login_button = tk.Button(login_page, text="Log in",width=14, font=('Bahnschrift', 13,'bold'),command=on_login,border=0, bg='#086587',fg='#FCFCFC')
 login_button.place(x=420, y=320)
 
 fpwd_button = tk.Button(login_page, text="Forgot Password",command=on_forgot,font=('Bahnschrift', 12,'underline'),border=0, fg='black',bg='#FCFCFC')
@@ -73,7 +89,7 @@ fpwd_button.place(x=420, y=360)
 noaccounttext=tk.Label(text="Don't Have an account?",bg='white',font=('Bahnschrift',13,),fg='#7A7A7A')
 noaccounttext.place(x=300,y=420)
 
-register_button = tk.Button(login_page, text="New User, Register Here!", font=('Bahnschrift', 13,'bold','underline'),border=0, fg='#332D2D',bg='#FCFCFC')
+register_button = tk.Button(login_page, text="New User, Register Here!", font=('Bahnschrift', 13,'bold','underline'),command=on_register,border=0, fg='#332D2D',bg='#FCFCFC')
 register_button.place(x=500, y=417)
 
 login_page.mainloop()
