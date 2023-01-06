@@ -1,15 +1,19 @@
 import smtplib
 import tkinter as tk
 from PIL import ImageTk, Image
+from subprocess import call
+from threading import Thread
 from tkinter import messagebox
 from pymongo import MongoClient
 import os
+import json
 
 
 client = MongoClient('localhost', 27017)
+
 db = client['mydb']
 
-collection = db['Final']
+collection = db['uibuilderdata']
 
 login_page=tk.Tk()
 login_page.geometry('750x500')
@@ -21,10 +25,11 @@ img0 = ImageTk.PhotoImage(Image.open("D:\Project\logo.png"))
 logo_lab = tk.Label(image = img0)
 logo_lab.place(x=570,y=-3)'''
 
+
 def on_forgot():
     a= usernamein.get()
     if len(a)==0:
-        messagebox.showerror("UI BUILDER","Enter your mobile number first")
+        messagebox.showerror("UI BUILDER","Enter your Username")
         return 0
     if collection.find({"username":a}):
 
@@ -47,7 +52,14 @@ def on_forgot():
 
 def on_login():
     if collection.find_one({"$and": [{"username":usernamein.get()},{"password":passwordin.get()}]}):
-        os.system("python main.py")
+        x=collection.find_one({"username":usernamein.get()})
+        new_json = {"User": usernamein.get(),"Root_path" : str(x['path'])}
+        with open("main_details.json", "w") as outfile:
+            json.dump(new_json, outfile)
+        login_page.destroy()
+        import main_file
+
+
     else:
         messagebox.showwarning("UI BUILDER","Please Check your username and password")
 

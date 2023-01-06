@@ -1,22 +1,20 @@
 import tkinter as tk
 from PIL import ImageTk, Image
-
+from subprocess import call
+from threading import Thread
 from pymongo import MongoClient
 from tkinter import messagebox
+import json
+import os
+
 
 client = MongoClient('localhost', 27017)
 db = client['mydb']
 
-collection = db['Final']
-
-list_users = [
-    {"username": "Admin", "password": "password", "mobile":"7075599756", "Mail": "poluru.vk@gmail.com"}
-]
-#collection.insert_many(list_users)
+collection = db['uibuilderdata']
 
 
-show_pass=1
-
+show_pass=0
 def on_showhide():
     global show_pass
     if show_pass==1:
@@ -56,16 +54,30 @@ def checkinp(username, password, mobile, mail, acc):
         else:
             counts+=1
 
-            if len(mobile)==10:
+            if len(mobile)==10 :
                 counts+=1
             counts+=acc
             if acc==0:
                 messagebox.showwarning("UI Builder","Select all options before proceeding ")
     if counts==4:
-        list_users=[{"username": username, "password": password, "mobile":str(mobile), "Mail": mail}]
+        messagebox.showinfo("UI Builder","Welcome to the community "+username+", Reopen the application to start using it!")
+        directory = username
+        parent_dir = "Documents/UIBUilder"
+        path = os.path.join(parent_dir, directory)
+        try:
+            os.makedirs(path, exist_ok=True)
+            print("Directory '%s' created successfully" % directory)
+        except OSError as error:
+            print("Directory '%s' can not be created" % directory)
+
+        user_data = [{username: f"Documents/UIBUilder/{username}"}]
+        list_users = [{"username": username, "password": password, "mobile": str(mobile), "Mail": mail, "path":f"Documents/UIBUilder/{username}"}]
         print(list_users)
         collection.insert_many(list_users)
-        messagebox.showinfo("UI Builder","Welcome to the community "+username+", Reopen the application to start using it!")
+
+        with open('new_file.json', 'w') as f:
+            json.dump(user_data, f)
+
         quit()
     else:
         messagebox.showerror("UI Builder", "Fill all the Details")

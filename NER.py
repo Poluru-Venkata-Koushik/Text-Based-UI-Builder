@@ -5,7 +5,7 @@ import json
 
 nlp=spacy.blank("en")
 db=DocBin()
-f=open('test.json')
+f=open('.json')
 TRAIN_DATA=json.load(f)
 
 for text,annot in tqdm(TRAIN_DATA["annotations"]):
@@ -20,6 +20,7 @@ for text,annot in tqdm(TRAIN_DATA["annotations"]):
     doc.ents = ents
     db.add(doc)
 
-db.to_disk("./test.spacy")
+db.to_disk("./training.spacy")
 
+#python -m spacy init fill-config base_config.cfg config.cfg
 #python -m spacy train config.cfg  --paths.train ./train.spacy --paths.dev ./train.spacy
